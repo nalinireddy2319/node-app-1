@@ -1,25 +1,25 @@
 node{
 	def dockerTag = getLatestCommitId()
-	def devIp = '172.31.6.150'
+	def devIp = '172.31.32.54'
     stage("SCM Checkout"){
         git credentialsId: 'git-hub', 
-            url: 'https://github.com/javahometech/node-app',
+            url: 'https://github.com/nalinireddy2319/node-app-1',
             branch: 'master'
     }
     stage('Docker - Build & Push'){
-        sh script: "docker build . -t kammana/node-app:${dockerTag} "
+        sh script: "docker build . -t sitharam321/node-app-1:${dockerTag} "
         
         withCredentials([string(credentialsId: 'docker-hub', variable: 'dockerHubPwd')]) {
-            sh script: "docker login -u kammana -p ${dockerHubPwd}"
+            sh script: "docker login -u sitharam321 -p ${dockerHubPwd}"
         }
         
-        sh script: "docker push kammana/node-app:${dockerTag}"
+        sh script: "docker push sitharam321/node-app-1:${dockerTag}"
     }
 	
 	stage('Dev Deploy'){
 		sh returnStatus: true, script: "ssh ec2-user@${devIp} docker rm -f nodeapp"
-		sh returnStatus: true, script: 'ssh ec2-user@${devIp} docker rmi $(docker images | grep kammana/node-app | awk \'{print $3}\')'
-	    sh "ssh ec2-user@${devIp} docker run -d -p 8080:8080 --name=nodeapp kammana/node-app:${dockerTag}"	
+		sh returnStatus: true, script: 'ssh ec2-user@${devIp} docker rmi $(docker images | grep sitharam321/node-app | awk \'{print $3}\')'
+	    sh "ssh ec2-user@${devIp} docker run -d -p 8080:8080 --name=nodeapp sitharam321/node-app:${dockerTag}"	
 	}
 }
 
